@@ -1,0 +1,27 @@
+{
+  "name": "rondo_kv545",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pioug/MidiConvert": "^3.0.0-beta.9",
+    "browserify": "^16.2.3",
+    "lib": "^4.0.0",
+    "midi-file-parser": "^1.0.0",
+    "midi-json-parser": "^6.0.20",
+    "midi-parser-js": "^3.1.7",
+    "midiconvert": "^0.4.7",
+    "p5": "^0.7.3",
+    "parcel-bundler": "^1.11.0",
+    "request": "^2.88.0",
+    "url-parse": "^1.4.4",
+    "webmidi": "^2.3.2"
+  }
+}
