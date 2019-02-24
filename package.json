@@ -11,16 +11,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pioug/MidiConvert": "^3.0.0-beta.9",
+    "@tonejs/midi": "^1.2.0",
     "browserify": "^16.2.3",
     "lib": "^4.0.0",
-    "midi-file-parser": "^1.0.0",
-    "midi-json-parser": "^6.0.20",
+    "midi-json-parser": "^6.0.21",
     "midi-parser-js": "^3.1.7",
-    "midiconvert": "^0.4.7",
     "p5": "^0.7.3",
     "parcel-bundler": "^1.11.0",
     "request": "^2.88.0",
+    "tone": "^13.7.6",
     "url-parse": "^1.4.4",
     "webmidi": "^2.3.2"
   }
