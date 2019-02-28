@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tonejs/midi": "^1.2.0",
+    "@tonejs/midi": "^1.2.1",
     "browserify": "^16.2.3",
     "lib": "^4.0.0",
     "midi-json-parser": "^6.0.21",
