@@ -7,8 +7,11 @@ const scores = require('../scores/*.mid');
 
 import webmidi from 'webmidi'
 import { timeout } from "q";
+import { groupBy } from "./helper";
 
 var viz_function = function(p) {
+
+  p.debug = false;
 
   p.monoSynth = new p5.MonoSynth();
 
@@ -23,7 +26,7 @@ var viz_function = function(p) {
 
     p.frameRate(60);
     p.noLoop();
-    var myCanvas = p.createCanvas(800,600);
+    var myCanvas = p.createCanvas(p.windowWidth,p.windowHeight);
     myCanvas.parent('viz2');
     p.noStroke();
 
@@ -36,7 +39,7 @@ var viz_function = function(p) {
                             );
     });
 
-    p.CreaSynths(20);
+    p.CreaSynths(10);
     Midi.fromUrl(scores["TheEnterntainer"])
         .then( p.playMidiFile );
 
@@ -47,37 +50,48 @@ var viz_function = function(p) {
   p.draw = () => {
     if (p.MidiJson == null ) return;
     let currentMillis = p.millis() - p.MillisBase;
-    let notesToDraw = p.AllNotes.filter(n => n.time*1000 >= p.PreviousMillis && n.time*1000 < currentMillis );
-    if (notesToDraw.length>0) console.log('notes :', notesToDraw.map(note=>note.name).join(",") );
-    notesToDraw.forEach(note => p.addSynth( note ) );
+    let notesToDraw = p.AllNotes.filter(n => n.time*1000 >= p.PreviousMillis && n.time*1000 < currentMillis );    
+    p.addManySynth( notesToDraw );
+    p.addManyDraw(notesToDraw);
     p.PreviousMillis = currentMillis;
   }
 
-  p.addSynth = (note) => {
-    let syntFreeElements = p.Synths.filter(s=>s.isfree) || [];
-    if (syntFreeElements.length > 0) {
-      let syntElement = syntFreeElements[0];
-      syntElement.isfree = false;
-      syntElement.synth.triggerAttackRelease(note.name, note.duration, Tone.now() + 0.5, note.velocity);
-      setTimeout( ()=> p.rmSynth(syntElement) , note.duration*1000+10  );
-    }
-    else {
-      console.warn("M'he quedat sense sintetitzadors");
-    }
+  p.addManyDraw = (notes) => {
+    p.stroke(0);
+    notes.forEach(note => {
+            let x = p.random(p.windowWidth);
+            let y = p.random(p.windowHeight);
+            p.ellipse(x,y,note.duration*100,note.duration*100);
+    });
   }
 
-  p.rmSynth = (syntElement) => {
-    syntElement.isfree = true; 
+  p.addManySynth = (notes) => {
+    let syntFreeElements = p.Synths.filter(s=>s.isfree) || [];
+    let notesByDuration = groupBy( notes, 'duration' );
+    let dif = Object.keys(notesByDuration).length - syntFreeElements.length;
+    let i = 0;
+    for (const [duration, notes] of Object.entries(notesByDuration)) {      
+      if (i>=syntFreeElements.length) break;
+      let syntElement = syntFreeElements[i];
+      syntElement.isfree = false;
+      syntElement.synth.triggerAttackRelease(notes.map(note=>note.name).join(","), duration, Tone.now() + 0.25, notes[0].velocity);
+      setTimeout( ()=> {syntElement.isfree = true;} , duration*1000+250  );
+      i++;
+    }
+    if (dif > 0) {
+      console.warn("M'he quedat sense sintetitzadors. En falten " + dif);
+    }
+    if (p.debug && notes.length>0) console.log(" Free synth "+ (-dif) + ' Notes :', notes.map(note=>note.name).join(",") + " " + Object.keys(notesByDuration).length +  " grups."  );
   }
 
   // - Midi file ----------------------------------------
 
   p.playMidiFile = (midiJson) => {
     p.MidiJson = midiJson;
-    console.log('p.MidiJson :', p.MidiJson);
+    if (p.debug) console.log('p.MidiJson :', p.MidiJson);
     p.MidiJson
       .tracks
-      .forEach(track => {p.AllNotes.push( ...track.notes ); console.log('p.AllNotes.len :', p.AllNotes.length);} );
+      .forEach(track => {p.AllNotes.push( ...track.notes );} );
     p.MillisBase = p.millis();
     p.loop();
   }
@@ -85,7 +99,7 @@ var viz_function = function(p) {
   // - Synth
 
   p.CreaSynths = (n) => {
-    console.log('Creant sintetitzadors :');
+    if (p.debug) console.log('Creant sintetitzadors :');
     for (let i = 0; i< n; i ++ ) {
       let synth = new Tone.PolySynth(n, Tone.Synth, {
         envelope : {
@@ -97,17 +111,8 @@ var viz_function = function(p) {
       }).toMaster();
       p.Synths[i] = { id:i, isfree: true, synth: synth};
     }      
-    console.log('Sintetitzadors creats :');
-  }
-
-  // - MIDI Events --------------------------------------------
-
-  p.noteon = (e) => {
-    p.monoSynth.play(e.note.name + e.note.octave, e.velocity, 0, 1/6);
-  }
-  p.noteoff = (e) => {
-  }
-  
+    if (p.debug) console.log('Sintetitzadors creats :');
+  }  
 }
 
 var viz = new p5(viz_function)
