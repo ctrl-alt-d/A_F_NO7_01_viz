@@ -4,6 +4,7 @@ import Midi  from '@tonejs/midi';
 import Tone  from 'tone';
 
 const scores = require('../scores/*.mid');
+const ttf = require('../assets/*.ttf');
 
 import webmidi from 'webmidi'
 import { groupBy } from "./helper";
@@ -27,6 +28,7 @@ var viz_function = function(p) {
     p.frameRate(60);
     p.noLoop();
     var myCanvas = p.createCanvas(p.windowWidth,p.windowHeight,p.WEBGL);
+    p.textFont(p.loadFont( ttf["Roboto-Light"]));
     p.pixelDensity(2);
     myCanvas.parent('viz2');
 
@@ -46,13 +48,18 @@ var viz_function = function(p) {
     });
 
     p.CreaSynths(10);
-    Midi.fromUrl(scores["Leonard_Cohen_-_Hallelujah_C_Dur"])
+    Midi.fromUrl(scores["TheEnterntainer"])
         .then( (midi) => {
-                            p.background(0);
+                            p.background(255);
                             p.stroke(0);
                             p.playMidiFile(midi);
         } );
  
+  }
+
+  p.windowResized = () => {
+    p.background(255);
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
   }
 
   // - Draw -------------------------------------------
@@ -66,6 +73,7 @@ var viz_function = function(p) {
     let notesToDraw = p.AllNotes.filter(n => n.time*1000 >= p.PreviousMillis && n.time*1000 < currentMillis );    
     p.addManySynth( notesToDraw );
     p.addManyDraw(notesToDraw);
+    p.drawSynths();
     p.PreviousMillis = currentMillis;
   }
 
@@ -81,6 +89,26 @@ var viz_function = function(p) {
     });
   }
 
+  p.drawSynths = () => {
+    let n = p.Synths.length;
+    let h = p.windowHeight / (n+2);
+    let w = h*6;
+    for (let s=0; s < n; s++) {
+      p.push();
+      p.translate(h,h*(s+1),0);
+      p.fill(200,200,250);
+      p.strokeWeight(1);
+      p.stroke(100,100,250);
+      p.rect(0,0,w,h);
+      p.fill(0)
+      p.strokeWeight(0);
+      p.textAlign(p.CENTER);
+      p.textSize(h/2);
+      p.text( p.Synths[s].playing, w/2, h/2 );
+      p.pop();
+    }  
+  }
+
   p.addManySynth = (notes) => {
     let syntFreeElements = p.Synths.filter(s=>s.isfree) || [];
     let notesByDuration = groupBy( notes, 'duration' );
@@ -90,8 +118,10 @@ var viz_function = function(p) {
       if (i>=syntFreeElements.length) break;
       let syntElement = syntFreeElements[i];
       syntElement.isfree = false;
-      syntElement.synth.triggerAttackRelease(notes.map(note=>note.name).join(","), duration, Tone.now() + 0.25, notes[0].velocity);
-      setTimeout( ()=> {syntElement.isfree = true;} , duration*1000+250  );
+      let notes_txt = notes.map(note=>note.name).join(",");
+      syntElement.playing=notes_txt;
+      syntElement.synth.triggerAttackRelease(notes_txt, duration, Tone.now() + 0.25, notes[0].velocity);
+      setTimeout( ()=> {syntElement.isfree = true; syntElement.playing=""; } , duration*1000+250  );
       i++;
     }
     if (dif > 0) {
@@ -127,7 +157,7 @@ var viz_function = function(p) {
           release : 1
         }
       }).toMaster();
-      p.Synths[i] = { id:i, isfree: true, synth: synth};
+      p.Synths[i] = { id:i, isfree: true, playing: "", synth: synth};
     }      
     if (p.debug) console.log('Sintetitzadors creats :');
   }  
