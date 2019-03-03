@@ -6,12 +6,11 @@ import Tone  from 'tone';
 const scores = require('../scores/*.mid');
 
 import webmidi from 'webmidi'
-import { timeout } from "q";
 import { groupBy } from "./helper";
 
 var viz_function = function(p) {
 
-  p.debug = false;
+  p.debug = true;
 
   p.monoSynth = new p5.MonoSynth();
 
@@ -21,13 +20,20 @@ var viz_function = function(p) {
   p.PreviousMillis = 0;
 
   p.Synths = [];
+  p.currentZ = 0;
 
   p.setup = function() {
 
     p.frameRate(60);
     p.noLoop();
-    var myCanvas = p.createCanvas(p.windowWidth,p.windowHeight);
+    var myCanvas = p.createCanvas(p.windowWidth,p.windowHeight,p.WEBGL);
+    p.pixelDensity(2);
     myCanvas.parent('viz2');
+
+    p.textAlign(p.CENTER);
+    p.textSize(p.windowWidth/50);
+    p.text('_ Creating Synths _', p.windowWidth/2, p.windowHeight/2);
+
     p.noStroke();
 
     //webmidi
@@ -40,15 +46,22 @@ var viz_function = function(p) {
     });
 
     p.CreaSynths(10);
-    Midi.fromUrl(scores["TheEnterntainer"])
-        .then( p.playMidiFile );
-
+    Midi.fromUrl(scores["Leonard_Cohen_-_Hallelujah_C_Dur"])
+        .then( (midi) => {
+                            p.background(0);
+                            p.stroke(0);
+                            p.playMidiFile(midi);
+        } );
+ 
   }
 
   // - Draw -------------------------------------------
 
   p.draw = () => {
     if (p.MidiJson == null ) return;
+    p.translate(-p.windowWidth/2, -p.windowHeight/2, 0);
+    //p.translate( 0, 0, -(p.currentZ--) );
+    //p.camera(p.mouseX, p.height/2, (p.height/2) / p.tan(p.PI/6), p.width/2, p.height/2, 0, 0, 1, 0);
     let currentMillis = p.millis() - p.MillisBase;
     let notesToDraw = p.AllNotes.filter(n => n.time*1000 >= p.PreviousMillis && n.time*1000 < currentMillis );    
     p.addManySynth( notesToDraw );
@@ -57,11 +70,14 @@ var viz_function = function(p) {
   }
 
   p.addManyDraw = (notes) => {
-    p.stroke(0);
+    p.fill(100,100,255);
     notes.forEach(note => {
+            p.push();
+            p.translate(0, 0, - note.duration*1000);
             let x = p.random(p.windowWidth);
             let y = p.random(p.windowHeight);
-            p.ellipse(x,y,note.duration*100,note.duration*100);
+            p.ellipse(x,y,p.windowWidth/50, p.windowWidth/50);
+            p.pop();
     });
   }
 
@@ -81,7 +97,9 @@ var viz_function = function(p) {
     if (dif > 0) {
       console.warn("M'he quedat sense sintetitzadors. En falten " + dif);
     }
-    if (p.debug && notes.length>0) console.log(" Free synth "+ (-dif) + ' Notes :', notes.map(note=>note.name).join(",") + " " + Object.keys(notesByDuration).length +  " grups."  );
+    if (p.debug && notes.length>0) console.log(" Free synth "+ (-dif) + 
+                                               ' Notes :', notes.map(note=>note.name).join(",") +  " In " + 
+                                               Object.keys(notesByDuration).length + " groups."  );
   }
 
   // - Midi file ----------------------------------------
