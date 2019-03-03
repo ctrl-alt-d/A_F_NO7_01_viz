@@ -97849,10 +97849,10 @@ var define;
 module.exports = "/A_F_NO7_01_viz/A_F_NO7_01.728d0188.mid";
 },{}],"../scores/Chopin__Trois_Valses.mid":[function(require,module,exports) {
 module.exports = "/A_F_NO7_01_viz/Chopin__Trois_Valses.bdd5de03.mid";
-},{}],"../scores/Erlkoenig_alt.mid":[function(require,module,exports) {
-module.exports = "/A_F_NO7_01_viz/Erlkoenig_alt.0aa816cc.mid";
 },{}],"../scores/Hit_the_road_Jack.mid":[function(require,module,exports) {
 module.exports = "/A_F_NO7_01_viz/Hit_the_road_Jack.139da862.mid";
+},{}],"../scores/Erlkoenig_alt.mid":[function(require,module,exports) {
+module.exports = "/A_F_NO7_01_viz/Erlkoenig_alt.0aa816cc.mid";
 },{}],"../scores/Leonard_Cohen_-_Hallelujah_C_Dur.mid":[function(require,module,exports) {
 module.exports = "/A_F_NO7_01_viz/Leonard_Cohen_-_Hallelujah_C_Dur.adbe97cc.mid";
 },{}],"../scores/TheEnterntainer.mid":[function(require,module,exports) {
@@ -97867,15 +97867,15 @@ module.exports = "/A_F_NO7_01_viz/lanative.e7040e20.mid";
 module.exports = {
   "A_F_NO7_01": require("./A_F_NO7_01.mid"),
   "Chopin__Trois_Valses": require("./Chopin__Trois_Valses.mid"),
-  "Erlkoenig_alt": require("./Erlkoenig_alt.mid"),
   "Hit_the_road_Jack": require("./Hit_the_road_Jack.mid"),
+  "Erlkoenig_alt": require("./Erlkoenig_alt.mid"),
   "Leonard_Cohen_-_Hallelujah_C_Dur": require("./Leonard_Cohen_-_Hallelujah_C_Dur.mid"),
   "TheEnterntainer": require("./TheEnterntainer.mid"),
   "TheEnterntainerBK": require("./TheEnterntainerBK.mid"),
   "bluemtns": require("./bluemtns.mid"),
   "lanative": require("./lanative.mid")
 };
-},{"./A_F_NO7_01.mid":"../scores/A_F_NO7_01.mid","./Chopin__Trois_Valses.mid":"../scores/Chopin__Trois_Valses.mid","./Erlkoenig_alt.mid":"../scores/Erlkoenig_alt.mid","./Hit_the_road_Jack.mid":"../scores/Hit_the_road_Jack.mid","./Leonard_Cohen_-_Hallelujah_C_Dur.mid":"../scores/Leonard_Cohen_-_Hallelujah_C_Dur.mid","./TheEnterntainer.mid":"../scores/TheEnterntainer.mid","./TheEnterntainerBK.mid":"../scores/TheEnterntainerBK.mid","./bluemtns.mid":"../scores/bluemtns.mid","./lanative.mid":"../scores/lanative.mid"}],"../assets/Roboto-Light.ttf":[function(require,module,exports) {
+},{"./A_F_NO7_01.mid":"../scores/A_F_NO7_01.mid","./Chopin__Trois_Valses.mid":"../scores/Chopin__Trois_Valses.mid","./Hit_the_road_Jack.mid":"../scores/Hit_the_road_Jack.mid","./Erlkoenig_alt.mid":"../scores/Erlkoenig_alt.mid","./Leonard_Cohen_-_Hallelujah_C_Dur.mid":"../scores/Leonard_Cohen_-_Hallelujah_C_Dur.mid","./TheEnterntainer.mid":"../scores/TheEnterntainer.mid","./TheEnterntainerBK.mid":"../scores/TheEnterntainerBK.mid","./bluemtns.mid":"../scores/bluemtns.mid","./lanative.mid":"../scores/lanative.mid"}],"../assets/Roboto-Light.ttf":[function(require,module,exports) {
 module.exports = "/A_F_NO7_01_viz/Roboto-Light.748f9e29.ttf";
 },{}],"../assets/*.ttf":[function(require,module,exports) {
 module.exports = {
@@ -98812,7 +98812,6 @@ var ttf = require('../assets/*.ttf');
 
 var viz_function = function viz_function(p) {
   p.debug = true;
-  p.monoSynth = new _p.default.MonoSynth();
   p.MidiJson = null;
   p.AllNotes = [];
   p.MillisBase = null;
@@ -98826,10 +98825,15 @@ var viz_function = function viz_function(p) {
     var myCanvas = p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
     p.textFont(p.loadFont(ttf["Roboto-Light"]));
     p.pixelDensity(2);
-    myCanvas.parent('viz2');
+    myCanvas.parent('viz2'); //
+
+    p.stroke(100, 100, 250);
+    p.fill(0);
+    p.strokeWeight(0);
     p.textAlign(p.CENTER);
-    p.textSize(p.windowWidth / 50);
-    p.text('_ Creating Synths _', p.windowWidth / 2, p.windowHeight / 2);
+    p.textSize(17);
+    p.text('_ Creating Synths _', p.windowWidth / 2, p.windowHeight / 2); //
+
     p.noStroke(); //webmidi
 
     _webmidi.default.enable(function (err) {
@@ -98869,7 +98873,7 @@ var viz_function = function viz_function(p) {
     });
     p.addManySynth(notesToDraw);
     p.addManyDraw(notesToDraw);
-    p.drawSynths();
+    if (p.debug) p.drawSynths();
     p.PreviousMillis = currentMillis;
   };
 
@@ -99017,7 +99021,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34339" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39555" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

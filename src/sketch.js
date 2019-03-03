@@ -12,9 +12,6 @@ import { groupBy } from "./helper";
 var viz_function = function(p) {
 
   p.debug = true;
-
-  p.monoSynth = new p5.MonoSynth();
-
   p.MidiJson = null;
   p.AllNotes = [];
   p.MillisBase = null;
@@ -32,10 +29,15 @@ var viz_function = function(p) {
     p.pixelDensity(2);
     myCanvas.parent('viz2');
 
+    //
+    p.stroke(100,100,250);
+    p.fill(0)
+    p.strokeWeight(0);
     p.textAlign(p.CENTER);
-    p.textSize(p.windowWidth/50);
+    p.textSize(17);
     p.text('_ Creating Synths _', p.windowWidth/2, p.windowHeight/2);
 
+    //
     p.noStroke();
 
     //webmidi
@@ -73,7 +75,7 @@ var viz_function = function(p) {
     let notesToDraw = p.AllNotes.filter(n => n.time*1000 >= p.PreviousMillis && n.time*1000 < currentMillis );    
     p.addManySynth( notesToDraw );
     p.addManyDraw(notesToDraw);
-    p.drawSynths();
+    if (p.debug) p.drawSynths();
     p.PreviousMillis = currentMillis;
   }
 
