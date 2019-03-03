@@ -97875,7 +97875,13 @@ module.exports = {
   "bluemtns": require("./bluemtns.mid"),
   "lanative": require("./lanative.mid")
 };
-},{"./A_F_NO7_01.mid":"../scores/A_F_NO7_01.mid","./Chopin__Trois_Valses.mid":"../scores/Chopin__Trois_Valses.mid","./Erlkoenig_alt.mid":"../scores/Erlkoenig_alt.mid","./Hit_the_road_Jack.mid":"../scores/Hit_the_road_Jack.mid","./Leonard_Cohen_-_Hallelujah_C_Dur.mid":"../scores/Leonard_Cohen_-_Hallelujah_C_Dur.mid","./TheEnterntainer.mid":"../scores/TheEnterntainer.mid","./TheEnterntainerBK.mid":"../scores/TheEnterntainerBK.mid","./bluemtns.mid":"../scores/bluemtns.mid","./lanative.mid":"../scores/lanative.mid"}],"../node_modules/webmidi/webmidi.min.js":[function(require,module,exports) {
+},{"./A_F_NO7_01.mid":"../scores/A_F_NO7_01.mid","./Chopin__Trois_Valses.mid":"../scores/Chopin__Trois_Valses.mid","./Erlkoenig_alt.mid":"../scores/Erlkoenig_alt.mid","./Hit_the_road_Jack.mid":"../scores/Hit_the_road_Jack.mid","./Leonard_Cohen_-_Hallelujah_C_Dur.mid":"../scores/Leonard_Cohen_-_Hallelujah_C_Dur.mid","./TheEnterntainer.mid":"../scores/TheEnterntainer.mid","./TheEnterntainerBK.mid":"../scores/TheEnterntainerBK.mid","./bluemtns.mid":"../scores/bluemtns.mid","./lanative.mid":"../scores/lanative.mid"}],"../assets/Roboto-Light.ttf":[function(require,module,exports) {
+module.exports = "/A_F_NO7_01_viz/Roboto-Light.748f9e29.ttf";
+},{}],"../assets/*.ttf":[function(require,module,exports) {
+module.exports = {
+  "Roboto-Light": require("./Roboto-Light.ttf")
+};
+},{"./Roboto-Light.ttf":"../assets/Roboto-Light.ttf"}],"../node_modules/webmidi/webmidi.min.js":[function(require,module,exports) {
 var define;
 /*
 
@@ -98802,6 +98808,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var scores = require('../scores/*.mid');
 
+var ttf = require('../assets/*.ttf');
+
 var viz_function = function viz_function(p) {
   p.debug = true;
   p.monoSynth = new _p.default.MonoSynth();
@@ -98816,6 +98824,7 @@ var viz_function = function viz_function(p) {
     p.frameRate(60);
     p.noLoop();
     var myCanvas = p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+    p.textFont(p.loadFont(ttf["Roboto-Light"]));
     p.pixelDensity(2);
     myCanvas.parent('viz2');
     p.textAlign(p.CENTER);
@@ -98836,11 +98845,16 @@ var viz_function = function viz_function(p) {
 
     p.CreaSynths(10);
 
-    _midi.default.fromUrl(scores["Leonard_Cohen_-_Hallelujah_C_Dur"]).then(function (midi) {
-      p.background(0);
+    _midi.default.fromUrl(scores["TheEnterntainer"]).then(function (midi) {
+      p.background(255);
       p.stroke(0);
       p.playMidiFile(midi);
     });
+  };
+
+  p.windowResized = function () {
+    p.background(255);
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
   }; // - Draw -------------------------------------------
 
 
@@ -98855,6 +98869,7 @@ var viz_function = function viz_function(p) {
     });
     p.addManySynth(notesToDraw);
     p.addManyDraw(notesToDraw);
+    p.drawSynths();
     p.PreviousMillis = currentMillis;
   };
 
@@ -98868,6 +98883,27 @@ var viz_function = function viz_function(p) {
       p.ellipse(x, y, p.windowWidth / 50, p.windowWidth / 50);
       p.pop();
     });
+  };
+
+  p.drawSynths = function () {
+    var n = p.Synths.length;
+    var h = p.windowHeight / (n + 2);
+    var w = h * 6;
+
+    for (var s = 0; s < n; s++) {
+      p.push();
+      p.translate(h, h * (s + 1), 0);
+      p.fill(200, 200, 250);
+      p.strokeWeight(1);
+      p.stroke(100, 100, 250);
+      p.rect(0, 0, w, h);
+      p.fill(0);
+      p.strokeWeight(0);
+      p.textAlign(p.CENTER);
+      p.textSize(h / 2);
+      p.text(p.Synths[s].playing, w / 2, h / 2);
+      p.pop();
+    }
   };
 
   p.addManySynth = function (notes) {
@@ -98888,11 +98924,14 @@ var viz_function = function viz_function(p) {
       if (i >= syntFreeElements.length) return "break";
       var syntElement = syntFreeElements[i];
       syntElement.isfree = false;
-      syntElement.synth.triggerAttackRelease(notes.map(function (note) {
+      var notes_txt = notes.map(function (note) {
         return note.name;
-      }).join(","), duration, _tone.default.now() + 0.25, notes[0].velocity);
+      }).join(",");
+      syntElement.playing = notes_txt;
+      syntElement.synth.triggerAttackRelease(notes_txt, duration, _tone.default.now() + 0.25, notes[0].velocity);
       setTimeout(function () {
         syntElement.isfree = true;
+        syntElement.playing = "";
       }, duration * 1000 + 250);
       i++;
     };
@@ -98941,6 +98980,7 @@ var viz_function = function viz_function(p) {
       p.Synths[i] = {
         id: i,
         isfree: true,
+        playing: "",
         synth: synth
       };
     }
@@ -98950,7 +98990,7 @@ var viz_function = function viz_function(p) {
 };
 
 var viz = new _p.default(viz_function);
-},{"p5":"../node_modules/p5/lib/p5.js","p5/lib/addons/p5.sound":"../node_modules/p5/lib/addons/p5.sound.js","@tonejs/midi":"../node_modules/@tonejs/midi/build/Midi.js","tone":"../node_modules/tone/build/Tone.js","../scores/*.mid":"../scores/*.mid","webmidi":"../node_modules/webmidi/webmidi.min.js","./helper":"helper.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"p5":"../node_modules/p5/lib/p5.js","p5/lib/addons/p5.sound":"../node_modules/p5/lib/addons/p5.sound.js","@tonejs/midi":"../node_modules/@tonejs/midi/build/Midi.js","tone":"../node_modules/tone/build/Tone.js","../scores/*.mid":"../scores/*.mid","../assets/*.ttf":"../assets/*.ttf","webmidi":"../node_modules/webmidi/webmidi.min.js","./helper":"helper.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -98977,7 +99017,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34589" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34339" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
